@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Courses</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>Course Management</h2>
+        </header>
+        <form id="courseForm" class="form">
+            <input type="text" id="courseName" placeholder="Course Name" required>
+            <input type="text" id="courseCode" placeholder="Course Code" required>
+            <button type="submit" class="btn submit-btn">Add Course</button>
+        </form>
+        <table id="coursesTable" class="table">
+            <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Course Code</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Course records will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+<script>
+    document.getElementById("courseForm").onsubmit = async function(event) {
+        event.preventDefault();
+        const courseName = document.getElementById("courseName").value;
+        const courseCode = document.getElementById("courseCode").value;
+        
+        await fetch('/api/courses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ course_name: courseName, course_code: courseCode })
+        });
+        loadCourses();
+    };
+    
+    async function loadCourses() {
+        const response = await fetch('/api/courses');
+        const courses = await response.json();
+        const tbody = document.getElementById("coursesTable").querySelector("tbody");
+        tbody.innerHTML = "";
+        courses.forEach(course => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${course.course_name}</td>
+                    <td>${course.course_code}</td>
+                    <td><button onclick="deleteCourse(${course.id})">Delete</button></td>
+                </tr>
+            `;
+        });
+    }
+    
+    async function deleteCourse(id) {
+        await fetch(`/api/courses/${id}`, { method: 'DELETE' });
+        loadCourses();
+    }
+    
+    loadCourses();
+    </script>
+    
+</html>

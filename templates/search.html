@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Page</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .search-container {
+            text-align: center;
+            margin-top: 30px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-left: auto;
+            margin-right: auto;
+            max-width:800px;
+        }
+        .search-container form {
+            margin-bottom: 20px;
+        }
+        .search-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .search-container input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right:20px;
+        }
+        .search-container button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .page-heading {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .search-container button:hover {
+            background-color: #0056b3;
+        }
+        .results-container {
+            background-color: #fff;
+            padding: 20px;
+            margin: 60px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width:600px;
+            margin-left: auto;
+            margin-right: auto;
+
+        }
+        .results-container h2 {
+            margin-top: 0;
+        }
+        .results-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .results-container li {
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div class="page-heading">
+    <h2>Search
+</div>
+    <!-- Search Section -->
+<div class="search-container">
+    <form action="/search_student" method="get">
+        <label for="student_name">Search by Student Name:</label>
+        <input type="text" id="student_name" name="student_name" required>
+        <button type="submit">Search Student</button>
+    </form>
+
+    <form action="/search_course" method="get">
+        <label for="course_name">Search by Course Name:</label>
+        <input type="text" id="course_name" name="course_name" required>
+        <button type="submit">Search Course</button>
+    </form>
+</div>
+
+<!-- Results Section -->
+<div class="results-container">
+    {% if student %}
+        <h2>Enrolled Courses for {{ student[1] }}</h2>  <!-- student[1] is the name -->
+        <ul>
+            {% for course in courses %}
+                <li>{{ course[1] }} ({{ course[2] }})</li>  <!-- course[1] is course_name, course[2] is course_code -->
+            {% endfor %}
+        </ul>
+    {% elif course %}
+        <h2>Students Enrolled in {{ course[1] }}</h2>  <!-- course[1] is course_name -->
+        <ul>
+            {% for student in students %}
+                <li>{{ student[1] }} - {{ student[3] }}</li>  <!-- student[1] is name, student[3] is email -->
+            {% endfor %}
+        </ul>
+    {% elif message %}
+        <p>{{ message }}</p>
+    {% endif %}
+</div>
+
+
+</div>
+<script src="/static/js/script.js"></script>
+</body>
+</html>

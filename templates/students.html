@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h2>Student Management</h2>
+        </header>
+        <form id="studentForm" class="form">
+            <input type="text" id="studentName" placeholder="Name" required>
+            <input type="number" id="studentAge" placeholder="Age" required>
+            <input type="email" id="studentEmail" placeholder="Email" required>
+            <button type="submit" class="btn submit-btn">Add Student</button>
+        </form>
+        <table id="studentsTable" class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Student records will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+<script>
+    document.getElementById("studentForm").onsubmit = async function(event) {
+        event.preventDefault();
+        const name = document.getElementById("studentName").value;
+        const age = document.getElementById("studentAge").value;
+        const email = document.getElementById("studentEmail").value;
+        
+        await fetch('/api/students', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, age, email })
+        });
+        loadStudents();
+    };
+    
+    async function loadStudents() {
+        const response = await fetch('/api/students');
+        const students = await response.json();
+        const tbody = document.getElementById("studentsTable").querySelector("tbody");
+        tbody.innerHTML = "";
+        students.forEach(student => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <span id="name-${student.id}">${student.name}</span>
+                        <input type="text" id="edit-name-${student.id}" value="${student.name}" style="display:none;">
+                    </td>
+                    <td>
+                        <span id="age-${student.id}">${student.age}</span>
+                        <input type="number" id="edit-age-${student.id}" value="${student.age}" style="display:none;">
+                    </td>
+                    <td>
+                        <span id="email-${student.id}">${student.email}</span>
+                        <input type="email" id="edit-email-${student.id}" value="${student.email}" style="display:none;">
+                    </td>
+                    <td>
+                        <button onclick="deleteStudent(${student.id})">Delete</button>
+                        <button onclick="showEdit(${student.id})">Edit</button>
+                        <button onclick="updateStudent(${student.id})" style="display:none;" id="update-btn-${student.id}">Update</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+    
+    async function deleteStudent(id) {
+        await fetch(`/api/students/${id}`, { method: 'DELETE' });
+        loadStudents();
+    }
+
+    function showEdit(id) {
+        document.getElementById(`name-${id}`).style.display = 'none';
+        document.getElementById(`edit-name-${id}`).style.display = 'inline';
+        document.getElementById(`age-${id}`).style.display = 'none';
+        document.getElementById(`edit-age-${id}`).style.display = 'inline';
+        document.getElementById(`email-${id}`).style.display = 'none';
+        document.getElementById(`edit-email-${id}`).style.display = 'inline';
+        document.getElementById(`update-btn-${id}`).style.display = 'inline';
+    }
+
+    async function updateStudent(id) {
+        const newName = document.getElementById(`edit-name-${id}`).value;
+        const newAge = document.getElementById(`edit-age-${id}`).value;
+        const newEmail = document.getElementById(`edit-email-${id}`).value;
+    
+        await fetch(`/api/students/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName, age: newAge, email: newEmail })
+        });
+    
+        loadStudents();
+    }
+
+    loadStudents();
+</script>
+
+</script>
+</html>

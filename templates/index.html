@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management Portal</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Student Management Portal</h1>
+        </header>
+
+        <!-- Summary Cards Section -->
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-icon">🎓</div>
+                <div class="card-content">
+                    <h2>Total Students</h2>
+                    <p>{{ total_students }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">📘</div>
+                <div class="card-content">
+                    <h2>Active Courses</h2>
+                    <p>{{ total_courses }}</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">👥</div>
+                <div class="card-content">
+                    <h2>Total Enrollments</h2>
+                    <p>{{ total_enrollments }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons Section -->
+        <nav class="action-buttons">
+            <a href="/students" class="btn">Manage Students</a>
+            <a href="/courses" class="btn">Manage Courses</a>
+            <a href="/enrollments" class="btn">Manage Enrollments</a>
+            <a href="/search" class="btn">Search</a>
+        </nav>
+    </div>
+   
+    <script src="/static/js/script.js"></script>
+</body>
+</html>

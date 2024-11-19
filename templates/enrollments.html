@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrollments</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin-bottom: 30px;
+        }
+        label, select, button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+        }
+        select, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            text-decoration: none;
+            background-color: #1f4f8b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #163a64;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #163a64;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1 align=center>Enrollments</h1>
+    <form id="enrollmentForm">
+        <label for="studentSelect">Select Student:</label>
+        <select id="studentSelect" required>
+            <option value="">Select Student</option>
+            {% for student in students %}
+                <option value="{{ student.id }}">{{ student.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="courseSelect">Select Course:</label>
+        <select id="courseSelect" required>
+            <option value="">Select Course</option>
+            {% for course in courses %}
+                <option value="{{ course.id }}">{{ course.course_name }}</option>
+            {% endfor %}
+        </select>
+        
+        <button type="submit">Enroll Student</button>
+    </form>
+
+    <h2>Current Enrollments</h2>
+    <table id="enrollmentsTable">
+        <thead>
+            <tr>
+                <th>Student name</th>
+                <th>Course code</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Enrollment data will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+    document.getElementById("enrollmentForm").onsubmit = async function(event) {
+        event.preventDefault();
+        const studentId = document.getElementById("studentSelect").value;
+        const courseId = document.getElementById("courseSelect").value;
+
+        const response = await fetch('/api/enrollments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_id: studentId, course_id: courseId })
+        });
+
+        if (response.ok) {
+            alert("Enrollment successful!");
+            loadEnrollments();
+        } else if (response.status === 409) { // Conflict status code
+            alert("Student is already enrolled in this course!");
+        } else {
+            alert("Failed to enroll. Please try again.");
+        }
+    };
+
+    async function loadEnrollments() {
+        const response = await fetch('/api/enrollments');
+        const enrollments = await response.json();
+        const tbody = document.getElementById("enrollmentsTable").querySelector("tbody");
+        tbody.innerHTML = "";
+        enrollments.forEach(enrollment => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${enrollment.student_name}</td>
+                    <td>${enrollment.course_code}</td>
+                    <td><button onclick="deleteEnrollment(${enrollment.id})">Delete</button></td>
+                </tr>
+            `;
+        });
+    }
+    
+
+    async function deleteEnrollment(id) {
+        await fetch(`/api/enrollments/${id}`, { method: 'DELETE' });
+        loadEnrollments();
+    }
+
+    loadEnrollments();
+    </script>
+</body>
+</html>
